@@ -1,6 +1,6 @@
 // inside db/seed.js
 const { client } = require('./client');
-const { createUser, getAllUsers} = require('./index')
+const { createUser, getAllUsers, createPlayer, getAllPlayers} = require('./index')
 
 async function dropTables() {
   try{
@@ -27,10 +27,11 @@ async function createTables() {
       "firstName" VARCHAR(255) NOT NULL,
       "lastName" VARCHAR(255) NOT NULL,
       position VARCHAR(255) NOT NULL,
-      "heightFeet" INTEGER,
-      "heightInches" INTEGER,
-      "weightPounds" INTEGER,
-      team VARCHAR(255) NOT NULL
+      "heightFeet" INTEGER NOT NULL,
+      "heightInches" INTEGER NOT NULL,
+      "weightPounds" INTEGER NOT NULL,
+      team VARCHAR(255) NOT NULL,
+      "imageURL" VARCHAR(255) NOT NULL
     );
     `)
 
@@ -60,11 +61,37 @@ async function createInitialUsers(){
       firstName: "Andrew",
       lastName: "Crow"
     })
+    const chelsea = await createUser({
+      username: "ChelseaCrow",
+      password: "Chelsea1",
+      firstName: "Chelsea",
+      lastName: "Crow"
+    })
 
   console.log("Finished creating initial users")
   } catch(error){
     console.error(error)
     throw error
+  }
+}
+
+async function createInitialPlayers () {
+  console.log("Creating initial players...")
+  try {
+    const lebronJames = await createPlayer(
+      firstName = "Lebron",
+      lastName = "James",
+      position = "F",
+      heightFeet = "6",
+      heightInches = "9",
+      weightPounds = "250",
+      team = "Los Angeles Lakers",
+      imageUrl = "https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/2544.png"
+    )
+
+    console.log("Finished creating initial players!")
+  } catch {
+
   }
 }
 
@@ -75,6 +102,7 @@ async function rebuildDB() {
     await dropTables()
     await createTables()
     await createInitialUsers()
+    await createInitialPlayers()
 
     console.log("Finished Rebuilding DB!")
   } catch(error) {
@@ -85,19 +113,18 @@ async function rebuildDB() {
 
 async function testDB() {
   try {
-    // client.connect();
     
     console.log("Starting to test database...")
     const users = await getAllUsers()
-    console.log("getAllUsers:", {users})
+    // console.log("getAllUsers:", users)
     
-    // const { rows } = await client.query(`SELECT * FROM users;`);
-    
-    // console.log(rows);
+    const players = await getAllPlayers()
+    console.log("Players:", players)
+
+    console.log("Finished testing database!")
   } catch (error) {
     console.error(error);
   } finally {
-    // it's important to close out the client connection
     client.end();
   }
 }
